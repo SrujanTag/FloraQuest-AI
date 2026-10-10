@@ -794,55 +794,36 @@ function stopSynthesizedForestAudio() {
 const SUBMISSION_TEMPLATE_MD = `*This is a submission for the [Hacktoberfest Open-Source AI Challenge Week 1: Touch Grass](https://dev.to/challenges/hacktoberfest-week1-2026-10-05)*
 
 ## What I Built
-**FloraQuest (TouchGrass AI)** is an offline-first nature companion powered by open-weight AI models, designed specifically to get people off their screens and outdoors in **under 60 seconds**.
+**FloraQuest-AI** is a lightweight, offline-first web companion designed to get you off the screen and into nature in under 60 seconds.
 
-Modern nature apps often create the very problem they aim to solve: trapping users in endless social feeds, notifications, and screen time while standing under beautiful tree canopies. FloraQuest is built on the opposite philosophy:
-1. **Rule of < 60 Seconds:** Deliver instant identification, a route, or planting advice in seconds, then explicitly prompt the user to pocket the device.
-2. **Offline Trail Specimen Classifier:** Uses open-weight neural vision (\`MobileNet-v2\` via Hugging Face Transformers.js) running client-side in WebAssembly. Works deep on the ridge or trail with zero cellular reception.
-3. **Autumn Foliage & Run Club Scout:** Generates customized outdoor run and hike loops based on available time (15–90 mins) paired with a 3-item sensory scavenger hunt (e.g., sound of crunching leaves, spotting acorn caps).
-4. **Frost & Soil Radar:** Calculates local frost dates and gives immediate "what to plant & harvest right now" tasks to get your hands in real soil.
-5. **Screen-Off Zen Mode:** Features a procedurally synthesized forest breeze using the Web Audio API, dimming the screen to let users focus on the outdoors.
-
----
+Features:
+- **Offline Specimen ID:** Identify trail leaves, trees, and birds using open-weight vision models (MobileNet-v2) running in your browser.
+- **Fall Foliage Route Scout:** Generate 15–90 min trail loops with a 3-item sensory scavenger hunt.
+- **Frost & Soil Radar:** Know what to sow (garlic, winter greens, bulbs) before the first freeze.
+- **Screen-Off Mode:** Ambient forest breeze synthesizer to encourage pocketing your phone.
 
 ## Demo
-- **Live Local Demo:** Simply open \`index.html\` in any modern browser!
-- **Zero API Keys Required:** Runs 100% on-device.
-
----
+- **Live Demo / Run:** Open index.html in your browser.
+- Works 100% offline with zero API keys required.
 
 ## Code
-- **Repository:** https://github.com/SrujanTag/FloraQuest-AI
-- **Tech Stack:** HTML5, Vanilla CSS3 (Custom Design System), Vanilla JS (ES Modules), Hugging Face \`@xenova/transformers\`, Web Audio API, WebAssembly.
-
----
+- **GitHub Repository:** https://github.com/SrujanTag/FloraQuest-AI
 
 ## How I Built It
-FloraQuest is architected from the ground up around **open-source AI**:
-- **Open-Weight Vision Pipeline:** Integrated \`@xenova/transformers\` running \`Xenova/mobilenet_v2_1.0_224\` directly inside the browser canvas/WebAssembly sandbox.
-- **Client-Side Model Cache:** Once downloaded, weights persist in browser CacheStorage. No data ever leaves the user's mobile device or laptop.
-- **Offline Heuristics & Specimen Knowledge Engine:** If taken on a trail before caching, a local botanical database with color histogram analysis guarantees zero crashes or connection timeouts.
-- **Procedural Nature Sound Engine:** Synthesizes realistic wind rustle and birdsong on the fly using Web Audio oscillators and pink-noise bandpass filters without loading large audio files.
-
----
+- **Open-Weight AI:** Hugging Face @xenova/transformers running MobileNet-v2 directly on-device in WebAssembly.
+- **Stack:** HTML5, Vanilla CSS, Vanilla JS, and Web Audio API for offline forest sounds.
+- **Local Fallback:** Built-in offline trail database for zero-signal environments.
 
 ## Why Does Open Innovation Matter?
-Open innovation isn't just an implementation choice for FloraQuest—it is the **only** reason this application can exist:
-
-1. **True Trail Independence (No Internet / No Towers):** Cloud-hosted AI APIs (OpenAI, Gemini, Anthropic) fail the moment you hike into a canyon or mountain forest without cellular signal. Open-weight models run locally on the silicon in your pocket, ensuring reliable identification anywhere on Earth.
-2. **Absolute Privacy in Nature:** Uploading photos with embedded GPS coordinates and timestamps to closed server farms compromises personal trail privacy. With open-weight local inference, zero pixels and zero location data ever leave the device.
-3. **Zero Cost Forever ($0 Infrastructure):** Closed APIs charge per token and image, making free community apps expensive to maintain. Open-source models cost nothing to run, allowing hikers, school groups, and community garden clubs to use it indefinitely without paywalls.
-4. **Full Model Freedom:** Open-source architectures let developers swap models (from \`MobileNet-v2\` to \`ViT\` or fine-tuned regional botanical weights) with a single configuration line.
-
----
+- **Runs with No Signal:** Deep in the woods or on the trail, closed cloud APIs don't work. Open weights run on your device without cell reception.
+- **Privacy:** Photos and GPS location never leave your phone.
+- **Zero Cost:** $0 in API fees or server hosting costs.
 
 ## My Agent Session
-Built with Antigravity AI pair programming assistant, establishing an offline-first architecture, responsive glassmorphic nature UI, and on-device WebAssembly model inference.
-
----
+Built with Antigravity AI pair programming assistant.
 
 ## Prize Categories
-- **Hacktoberfest Open-Source AI Challenge Week 1: Touch Grass**
+- Hacktoberfest Open-Source AI Challenge Week 1: Touch Grass
 `;
 
 function initSubmissionModal() {

@@ -1,0 +1,4 @@
+# Ignore submission draft from GitHub repo
+SUBMISSION.md
+.DS_Store
+Thumbs.db

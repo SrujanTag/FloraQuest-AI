@@ -64,12 +64,12 @@ npx serve .
 ## 📦 Project Structure
 
 ```
-touchgrass-ai/
-├── index.html        # Clean semantic HTML5 layout with tabs & modal
-├── style.css         # Custom high-aesthetic obsidian nature design system
-├── app.js            # Transformers.js client inference, audio synth, and state
-├── README.md         # Project documentation & local instructions
-└── SUBMISSION.md     # Dev.to Hacktoberfest submission post ready to publish
+FloraQuest-AI/
+├── index.html          # Semantic HTML5 layout with tabs & modal
+├── style.css           # Custom obsidian nature design system
+├── app.js              # Client-side Transformers.js AI inference & Web Audio
+├── PROJECT_DETAILS.md  # Detailed technical specifications & architecture
+└── README.md           # Quickstart and overview
 ```
 
 ---
