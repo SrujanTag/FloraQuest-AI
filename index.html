@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FloraQuest — 60-Second Offline Nature & Foliage Scout</title>
+  <meta name="description" content="An open-weight AI companion built for Hacktoberfest 'Touch Grass'. Identifies trail foliage, builds autumn run routes, and checks frost dates in under 60 seconds — 100% offline.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient Forest Gradient Background -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-icon">
+        <span class="leaf-emoji">🌿</span>
+      </div>
+      <div>
+        <div class="brand-title-wrap">
+          <h1 class="brand-title">FloraQuest</h1>
+          <span class="badge badge-accent">Touch Grass Edition</span>
+        </div>
+        <p class="brand-tagline">Open-Weight AI • 100% Offline Trail Ready • 0 Server Calls</p>
+      </div>
+    </div>
+
+    <div class="header-status">
+      <div class="status-pill" id="aiStatusPill" title="Local Model State">
+        <span class="status-dot pulsing"></span>
+        <span id="aiStatusText">Local Model: Ready</span>
+      </div>
+      <div class="screentime-tracker" title="Current session screen time">
+        <span class="timer-icon">⏱️</span>
+        <span>Screen: <strong id="screenTimer">00:00</strong></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Banner: Philosophy -->
+  <section class="banner-mission">
+    <div class="mission-text">
+      <strong>Rule #1 of Touch Grass:</strong> The screen should be the shortest part of your day. Get your answer in <strong>&lt; 60 seconds</strong>, then pocket the phone and look up at the trees.
+    </div>
+    <button class="btn btn-sm btn-ghost" id="quickGrassBtn">🍃 Screen-Off Mode</button>
+  </section>
+
+  <!-- Navigation Tabs -->
+  <nav class="nav-tabs">
+    <button class="nav-tab active" data-tab="flora">
+      <span class="tab-icon">🍂</span>
+      <span>Trail Specimen ID</span>
+      <span class="tab-hint">Open-Weight Vision</span>
+    </button>
+    <button class="nav-tab" data-tab="foliage">
+      <span class="tab-icon">🍁</span>
+      <span>Fall Foliage Route</span>
+      <span class="tab-hint">Run & Hike Scout</span>
+    </button>
+    <button class="nav-tab" data-tab="frost">
+      <span class="tab-icon">🌱</span>
+      <span>Frost & Soil Radar</span>
+      <span class="tab-hint">What To Plant Now</span>
+    </button>
+    <button class="nav-tab" data-tab="screenoff">
+      <span class="tab-icon">🌲</span>
+      <span>Screen-Off Companion</span>
+      <span class="tab-hint">Binaural Forest Walk</span>
+    </button>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="main-container">
+
+    <!-- TAB 1: Trail Specimen ID -->
+    <section class="tab-panel active" id="tab-flora">
+      <div class="panel-header">
+        <div>
+          <h2>Offline Trail Specimen Classifier</h2>
+          <p class="subtitle">Identify leaves, fungi, bark, and wildlife with open-weights running directly in your browser. No cell signal required.</p>
+        </div>
+        <div class="model-badge">
+          <span class="mono-badge">Model: MobileNet-v2 (Open-Weights)</span>
+        </div>
+      </div>
+
+      <div class="specimen-grid">
+        <!-- Input & Preview Card -->
+        <div class="card card-upload">
+          <div class="dropzone" id="dropzone">
+            <input type="file" id="imageInput" accept="image/*" class="file-input">
+            <div class="dropzone-content" id="dropzonePrompt">
+              <div class="upload-icon-circle">📷</div>
+              <h3>Drop specimen photo or click to take</h3>
+              <p>Works completely on your device — trail data never leaves your phone</p>
+              <button class="btn btn-outline" type="button">Select Image</button>
+            </div>
+            <div class="dropzone-preview hidden" id="previewContainer">
+              <img id="previewImage" alt="Specimen Preview" src="">
+              <button class="btn-clear" id="clearImageBtn" title="Remove image">✕</button>
+            </div>
+          </div>
+
+          <!-- Quick Samples for quick testing -->
+          <div class="sample-picker">
+            <span class="sample-label">Quick test presets:</span>
+            <div class="sample-chips">
+              <button class="chip" data-sample="leaf">🍁 Autumn Maple</button>
+              <button class="chip" data-sample="fern">🌿 Forest Fern</button>
+              <button class="chip" data-sample="mushroom">🍄 Pine Mushroom</button>
+              <button class="chip" data-sample="bird">🐦 Songbird</button>
+            </div>
+          </div>
+
+          <div class="action-bar">
+            <button class="btn btn-primary btn-block" id="analyzeBtn">
+              <span id="analyzeSpinner" class="spinner hidden"></span>
+              <span id="analyzeBtnText">⚡ Analyze Specimen (Local AI)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Specimen Result Card -->
+        <div class="card card-result" id="resultCard">
+          <div class="result-placeholder" id="resultPlaceholder">
+            <div class="nature-compass">🧭</div>
+            <h3>Waiting for Specimen</h3>
+            <p>Upload a leaf or select a quick test preset above. The open-weight model runs on-device neural inference in milliseconds.</p>
+          </div>
+
+          <div class="result-content hidden" id="resultContent">
+            <div class="result-top">
+              <div class="confidence-meter">
+                <span class="confidence-label">Confidence</span>
+                <div class="meter-bar">
+                  <div class="meter-fill" id="meterFill" style="width: 88%;"></div>
+                </div>
+                <span class="confidence-value" id="confidenceValue">88%</span>
+              </div>
+              <span class="badge badge-success" id="rarityBadge">Common Trail Find</span>
+            </div>
+
+            <h3 class="specimen-name" id="specimenName">Sugar Maple (Acer saccharum)</h3>
+            <p class="specimen-class-label" id="specimenCategory">Broadleaf Deciduous • Autumn Foliage</p>
+
+            <div class="field-guide-box">
+              <div class="field-guide-header">
+                <span class="guide-icon">📖</span>
+                <strong>60-Second Trail Guide Fact</strong>
+              </div>
+              <p class="field-guide-text" id="fieldGuideFact">
+                Known for brilliant orange and fiery scarlet fall displays. Its sap is boiled down in early spring to produce pure maple syrup. Look for 5 deep lobes with U-shaped notches.
+              </p>
+            </div>
+
+            <div class="scavenger-challenge">
+              <div class="challenge-tag">🎯 Eyes-Up Trail Challenge</div>
+              <p id="challengeText">Look up from your screen right now! Can you find 3 different shades of amber within 10 paces?</p>
+            </div>
+
+            <!-- Alternative Top Predictions -->
+            <div class="alt-predictions">
+              <span class="alt-label">Top Local Predictions:</span>
+              <ul class="alt-list" id="altPredictionsList">
+                <!-- Populated dynamically -->
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: Fall Foliage & Run Trail Route Builder -->
+    <section class="tab-panel" id="tab-foliage">
+      <div class="panel-header">
+        <div>
+          <h2>Fall Foliage & Run Club Route Scout</h2>
+          <p class="subtitle">Generate an outdoor adventure tailored to your schedule. Maximize tree canopy and minimize pavement.</p>
+        </div>
+        <div class="model-badge">
+          <span class="mono-badge">Offline Route & Sensory Generator</span>
+        </div>
+      </div>
+
+      <div class="route-grid">
+        <!-- Controls -->
+        <div class="card card-form">
+          <form id="routeForm">
+            <div class="form-group">
+              <label for="trailDuration">Duration / Screen Limit</label>
+              <div class="range-wrap">
+                <input type="range" id="trailDuration" min="15" max="90" step="15" value="30">
+                <div class="range-labels">
+                  <span>15 min</span>
+                  <span class="active-val" id="durationDisplay">30 minutes</span>
+                  <span>90 min</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Target Outdoor Environment</label>
+              <div class="radio-tiles">
+                <label class="radio-tile">
+                  <input type="radio" name="environment" value="foliage" checked>
+                  <div class="tile-content">
+                    <span class="tile-icon">🍁</span>
+                    <span class="tile-title">Fall Foliage</span>
+                    <span class="tile-desc">Peak amber & red canopy</span>
+                  </div>
+                </label>
+                <label class="radio-tile">
+                  <input type="radio" name="environment" value="creek">
+                  <div class="tile-content">
+                    <span class="tile-icon">💧</span>
+                    <span class="tile-title">Creek & Rapids</span>
+                    <span class="tile-desc">Riparian trees & sound</span>
+                  </div>
+                </label>
+                <label class="radio-tile">
+                  <input type="radio" name="environment" value="forest">
+                  <div class="tile-content">
+                    <span class="tile-icon">🌲</span>
+                    <span class="tile-title">Evergreen Pine</span>
+                    <span class="tile-desc">Deep scent & shaded path</span>
+                  </div>
+                </label>
+                <label class="radio-tile">
+                  <input type="radio" name="environment" value="meadow">
+                  <div class="tile-content">
+                    <span class="tile-icon">🌾</span>
+                    <span class="tile-title">Wild Meadow</span>
+                    <span class="tile-desc">Golden hour & grasses</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="activityType">Activity Type</label>
+              <select id="activityType" class="select-input">
+                <option value="run">🏃‍♂️ Trail Run / Run Club</option>
+                <option value="walk" selected>🥾 Mindful Walk / Hike</option>
+                <option value="bike">🚲 Gravel / Nature Bike</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">
+              🗺️ Generate Outdoor Route & Sensory Hunt
+            </button>
+          </form>
+        </div>
+
+        <!-- Generated Mission Card -->
+        <div class="card card-mission" id="missionCard">
+          <div class="mission-header">
+            <div>
+              <span class="badge badge-accent" id="missionTag">30-Min Autumn Circuit</span>
+              <h3 id="missionTitle">The Amber Canopy Loop</h3>
+            </div>
+            <div class="mission-meta">
+              <span id="estimatedDistance">~2.8 km</span>
+              <span id="elevationGain">↗ 45m gain</span>
+            </div>
+          </div>
+
+          <div class="sensory-scavenger-hunt">
+            <h4>👀 3 Things To Spot (Screen-Free Challenge)</h4>
+            <div class="scavenger-items" id="scavengerItems">
+              <label class="scavenger-item">
+                <input type="checkbox">
+                <span>Find an oak tree shedding acorn caps</span>
+              </label>
+              <label class="scavenger-item">
+                <input type="checkbox">
+                <span>Spot two distinct leaf colors on the same branch</span>
+              </label>
+              <label class="scavenger-item">
+                <input type="checkbox">
+                <span>Hear the crunch of dry leaves underfoot for 20 paces</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="trail-itinerary">
+            <h4>🧭 Step-by-Step Waypoints</h4>
+            <ol class="waypoint-list" id="waypointList">
+              <li>
+                <strong>Minute 0-5:</strong> Leave the trailhead; silence phone notifications.
+              </li>
+              <li>
+                <strong>Minute 5-15:</strong> Follow the dirt ridge path toward the highest tree grove.
+              </li>
+              <li>
+                <strong>Minute 15-25:</strong> Cross the small wooden footbridge; look down for fallen amber leaves floating in eddies.
+              </li>
+              <li>
+                <strong>Minute 25-30:</strong> Loop back along the perimeter trail. Deep breath of damp forest air.
+              </li>
+            </ol>
+          </div>
+
+          <div class="mission-footer">
+            <button class="btn btn-outline btn-sm" id="printRouteBtn">🖨️ Pocket Trail Card</button>
+            <button class="btn btn-accent btn-sm" id="startRouteWalkBtn">🌲 Start Screen-Off Walk</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: Frost & Soil Garden Radar -->
+    <section class="tab-panel" id="tab-frost">
+      <div class="panel-header">
+        <div>
+          <h2>Autumn Frost & Soil Garden Radar</h2>
+          <p class="subtitle">Get your hands in real soil. Know what to sow, harvest, or mulch before the ground freezes.</p>
+        </div>
+        <div class="model-badge">
+          <span class="mono-badge">Micro-Climate Soil Engine</span>
+        </div>
+      </div>
+
+      <div class="garden-grid">
+        <div class="card card-form">
+          <div class="form-group">
+            <label for="hardinessZone">Select Climate Zone</label>
+            <select id="hardinessZone" class="select-input">
+              <option value="zone4">Zone 4 (First Frost: Mid-Sept - Early Oct)</option>
+              <option value="zone5">Zone 5 (First Frost: Early to Mid-Oct)</option>
+              <option value="zone6" selected>Zone 6 (First Frost: Mid to Late Oct)</option>
+              <option value="zone7">Zone 7 (First Frost: Late Oct - Early Nov)</option>
+              <option value="zone8">Zone 8 (First Frost: Mid to Late Nov)</option>
+              <option value="zone9">Zone 9 (First Frost: Early to Mid Dec)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="gardenType">Garden Space</label>
+            <select id="gardenType" class="select-input">
+              <option value="raised">Raised Garden Beds</option>
+              <option value="ground" selected>In-Ground Backyard Patch</option>
+              <option value="containers">Balcony Containers & Pots</option>
+              <option value="foraging">Wild Foraging & Native Plants</option>
+            </select>
+          </div>
+
+          <div class="frost-alert-box" id="frostCountdownBox">
+            <div class="frost-icon">❄️</div>
+            <div>
+              <strong id="frostStatusHead">Estimated First Frost: ~12 Days Away</strong>
+              <p id="frostStatusSub">Soil temperature is around 52°F (11°C). Ideal for cold-hardy brassicas and garlic cloves.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card card-plant-guide">
+          <h3>🌱 Outdoor Garden Action Plan This Week</h3>
+          <p class="subtitle">Turn off this browser tab, grab a spade, and get outdoors:</p>
+
+          <div class="plant-columns" id="plantAdviceContainer">
+            <!-- Dynamic Category Cards -->
+            <div class="plant-category">
+              <div class="cat-header cat-sow">
+                <span>🥕 Direct Sow Right Now</span>
+              </div>
+              <ul class="plant-item-list" id="sowList">
+                <li><strong>Garlic (Hardneck):</strong> Plant cloves 2 inches deep, pointy end up. Roots form all winter!</li>
+                <li><strong>Winter Spinach:</strong> Germinates in cool soil; sweetens with first frost.</li>
+                <li><strong>Daffodil & Tulip Bulbs:</strong> Bury now for vivid spring blooms.</li>
+              </ul>
+            </div>
+
+            <div class="plant-category">
+              <div class="cat-header cat-harvest">
+                <span>🎃 Harvest & Store</span>
+              </div>
+              <ul class="plant-item-list" id="harvestList">
+                <li><strong>Winter Squash:</strong> Cut before a hard freeze; cure in a sunny spot.</li>
+                <li><strong>Kale & Collards:</strong> Frost transforms starches into sugars—flavor improves!</li>
+                <li><strong>Root Veggies:</strong> Carrots and beets can stay under heavy straw mulch.</li>
+              </ul>
+            </div>
+
+            <div class="plant-category">
+              <div class="cat-header cat-prep">
+                <span>🍂 Soil & Grass Care</span>
+              </div>
+              <ul class="plant-item-list" id="prepList">
+                <li><strong>Shred Fallen Leaves:</strong> Don't bag them—layer over garden soil as winter blanket.</li>
+                <li><strong>Aeration:</strong> Walk bare ground or aerate compacted lawn paths.</li>
+                <li><strong>Clean Pruners:</strong> Oil your outdoor garden tools before winter storage.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: Screen-Off Companion -->
+    <section class="tab-panel" id="tab-screenoff">
+      <div class="screenoff-hero">
+        <div class="zen-circle" id="zenCircle">
+          <span class="zen-emoji" id="zenEmoji">🌲</span>
+        </div>
+        <h2 id="screenOffTitle">Screen-Off Nature Walk Active</h2>
+        <p class="zen-subtitle" id="screenOffSubtitle">
+          Pocket your device. Feel the breeze, look at tree boughs, and breathe crisp outdoor air.
+        </p>
+
+        <!-- Generative Forest Audio Generator -->
+        <div class="audio-controller">
+          <div class="sound-row">
+            <button class="btn btn-outline" id="toggleForestAudioBtn">
+              <span id="audioBtnIcon">🔊</span>
+              <span id="audioBtnText">Play Synthesized Forest Breeze</span>
+            </button>
+            <span class="audio-note">100% offline Web Audio synthesizer • No streaming data</span>
+          </div>
+        </div>
+
+        <div class="zen-stats">
+          <div class="stat-card">
+            <span class="stat-num" id="zenMinutesWalked">0</span>
+            <span class="stat-label">Minutes Outdoors</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num" id="zenBreathsTaken">0</span>
+            <span class="stat-label">Deep Breaths</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num" id="zenSpeciesFound">1</span>
+            <span class="stat-label">Specimens Scouted</span>
+          </div>
+        </div>
+
+        <div class="screen-off-actions">
+          <button class="btn btn-accent" id="wakeScreenBtn">I'm Back from Touching Grass 🌿</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer with Open Innovation Transparency -->
+  <footer class="app-footer">
+    <div class="footer-content">
+      <div class="footer-left">
+        <p><strong>FloraQuest: Touch Grass Edition</strong> — Built with Open-Weight AI models running 100% client-side.</p>
+        <p class="footer-meta">
+          Powered by <strong>Hugging Face Transformers.js</strong> & <strong>MobileNet-v2</strong> • MIT License • Zero telemetry.
+        </p>
+      </div>
+      <div class="footer-right">
+        <a href="#submissionModal" class="footer-link" id="viewSubmissionBtn">📄 View Hackathon Post Template</a>
+        <a href="https://dev.to/challenges/hacktoberfest-week1-2026-10-05" target="_blank" rel="noopener" class="footer-link">Challenge Details ↗</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Submission Modal for Easy Copying -->
+  <div class="modal-backdrop hidden" id="submissionModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Dev.to Hacktoberfest Submission Post</h3>
+        <button class="modal-close" id="closeModalBtn">✕</button>
+      </div>
+      <p class="modal-hint">
+        Copy this pre-filled markdown post directly into your Dev.to submission:
+      </p>
+      <div class="modal-code-wrap">
+        <button class="btn btn-sm btn-accent btn-copy" id="copySubmissionBtn">📋 Copy Markdown</button>
+        <pre><code id="submissionCodeBlock">Loading submission content...</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js" type="module"></script>
+</body>
+</html>
